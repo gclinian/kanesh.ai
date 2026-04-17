@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.Spotlight-V100
+.Trashes
+
+# Editor
+.vscode/
+.idea/
+*.sublime-*
+.cursor/
+
+# Node (in case we add tooling later)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build output
+dist/
+build/
+.out/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log

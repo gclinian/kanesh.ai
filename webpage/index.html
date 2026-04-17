@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanesh — The Data-Sovereign Backbone for the EDA AI Era</title>
+  <meta name="description" content="Kanesh combines federated learning, trusted execution environments, and smart contracts so that chip companies can co-train EDA AI models without raw data ever leaving their premises." />
+  <meta name="theme-color" content="#0B1E3B" />
+
+  <meta property="og:title" content="Kanesh — Data stays home. Value goes global." />
+  <meta property="og:description" content="Privacy-preserving collaborative training infrastructure for the EDA industry." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Kanesh — Data stays home. Value goes global." />
+  <meta name="twitter:description" content="Privacy-preserving collaborative training infrastructure for the EDA industry." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="nav" aria-label="Primary">
+    <div class="nav__inner">
+      <a href="#top" class="brand" aria-label="Kanesh home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <defs>
+              <linearGradient id="gx" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#D4AA6F"/>
+                <stop offset="1" stop-color="#B08D57"/>
+              </linearGradient>
+            </defs>
+            <rect x="3" y="3" width="26" height="26" rx="5" fill="none" stroke="url(#gx)" stroke-width="2"/>
+            <path d="M10 10 L10 22 M10 16 L22 16 M22 10 L22 22" stroke="url(#gx)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <circle cx="16" cy="16" r="2.2" fill="url(#gx)"/>
+          </svg>
+        </span>
+        <span class="brand__word">Kanesh</span>
+      </a>
+      <ul class="nav__links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#solution">Solution</a></li>
+        <li><a href="#architecture">How&nbsp;it&nbsp;Works</a></li>
+        <li><a href="#use-cases">Use&nbsp;Cases</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a class="nav__cta" href="#contact">Partner with us</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- ================= HERO ================= -->
+    <section class="hero" id="top">
+      <div class="hero__bg" aria-hidden="true"></div>
+      <div class="container hero__inner">
+        <p class="eyebrow">Privacy-preserving AI for chip design</p>
+        <h1 class="hero__title">
+          <span class="hero__title-main">Data stays home.</span>
+          <span class="hero__title-accent">Value goes global.</span>
+        </h1>
+        <p class="hero__subtitle">
+          Kanesh is the first privacy-preserving collaborative-training infrastructure dedicated
+          to the EDA industry. Foundries, fabless leaders, and AI developers train the next
+          generation of ML-for-EDA models together — without a single byte of raw IP ever
+          leaving the provider.
+        </p>
+        <div class="hero__ctas">
+          <a class="btn btn--primary" href="#contact">Partner with us</a>
+          <a class="btn btn--ghost" href="#solution">See how it works →</a>
+        </div>
+        <dl class="hero__stats">
+          <div><dt>Foundries locked out today</dt><dd>100%</dd></div>
+          <div><dt>Federated-learning coverage in EDA</dt><dd>~0%</dd></div>
+          <div><dt>Global ML-for-EDA TAM by 2030</dt><dd>$3.2B</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ================= PROBLEM ================= -->
+    <section class="section section--dark" id="problem">
+      <div class="container">
+        <p class="eyebrow eyebrow--muted">The problem</p>
+        <h2 class="section__title">The most valuable training data in chip design is locked away.</h2>
+        <div class="grid grid--2">
+          <article class="card card--outline">
+            <h3>Data providers can't share</h3>
+            <p>
+              Foundries hold billions of dollars of PDK, production netlists, layout, and PPA
+              data. Fabless leaders hold battle-tested RTL and verification telemetry. Moving
+              any of it outside a secure perimeter is a legal, strategic, and national-security
+              non-starter.
+            </p>
+          </article>
+          <article class="card card--outline">
+            <h3>AI developers can't train</h3>
+            <p>
+              ML-for-EDA startups and academic labs train on toy benchmarks that bear little
+              resemblance to 3nm production. The result: models that never close the loop to a
+              real tape-out, and an industry that leaves massive PPA improvements on the table.
+            </p>
+          </article>
+        </div>
+        <p class="pull-quote">
+          Today, the most economically valuable dataset in chip design is also the least
+          usable. Kanesh changes that — without asking anyone to trust anyone.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= SOLUTION ================= -->
+    <section class="section" id="solution">
+      <div class="container">
+        <p class="eyebrow">The Kanesh stack</p>
+        <h2 class="section__title">Three cryptographic layers. One trustless platform.</h2>
+        <p class="section__lead">
+          Kanesh composes three independent defense-in-depth layers so that a malicious
+          coordinator, a curious peer, and a compromised network are all insufficient to leak
+          a single line of RTL.
+        </p>
+        <div class="grid grid--3">
+          <article class="card card--feature">
+            <span class="card__num">01</span>
+            <h3>Federated Learning</h3>
+            <p class="card__kicker">Models travel. Raw IP doesn't.</p>
+            <p>
+              Training happens where the data lives. Kanesh ships EDA-native architectures —
+              graph neural networks over netlists, Transformers over RTL, U-Nets over layout
+              heatmaps — and orchestrates rounds across foundry and fabless sites with
+              Byzantine-robust aggregation.
+            </p>
+            <ul class="card__tags">
+              <li>FedAvg / FedProx / FedOpt</li>
+              <li>Krum · Bulyan · FLTrust</li>
+              <li>Non-IID &amp; cross-process heterogeneity</li>
+            </ul>
+          </article>
+
+          <article class="card card--feature">
+            <span class="card__num">02</span>
+            <h3>Privacy Shield</h3>
+            <p class="card__kicker">Four layers. Zero assumptions.</p>
+            <p>
+              Differential Privacy (DP-SGD), Secure Aggregation, and confidential-compute TEEs
+              compose so that even a fully compromised coordinator learns nothing about
+              individual contributors. Gradient-inversion and membership-inference attacks are
+              neutralized independently at each layer.
+            </p>
+            <ul class="card__tags">
+              <li>NVIDIA H100 Confidential Compute</li>
+              <li>Intel TDX · AMD SEV-SNP</li>
+              <li>DP-SGD · Bonawitz Secure Aggregation</li>
+            </ul>
+          </article>
+
+          <article class="card card--feature">
+            <span class="card__num">03</span>
+            <h3>Smart Contract Incentives</h3>
+            <p class="card__kicker">Contributors paid in proportion to value.</p>
+            <p>
+              Data Shapley quantifies each dataset's marginal utility to the trained model.
+              Rewards are distributed automatically on a Layer-2 chain. Training honesty is
+              attested by zkML proofs; disputes resolved by a DAO-governed court.
+            </p>
+            <ul class="card__tags">
+              <li>Data Shapley · KNN-Shapley</li>
+              <li>zkML proof of training</li>
+              <li>Layer-2 settlement (Base / Polygon)</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ARCHITECTURE ================= -->
+    <section class="section section--dark" id="architecture">
+      <div class="container">
+        <p class="eyebrow">How it works</p>
+        <h2 class="section__title">From a training job to a settled reward — in four steps.</h2>
+        <ol class="steps">
+          <li class="step">
+            <span class="step__num">1</span>
+            <h3>Register &amp; stake</h3>
+            <p>
+              Data providers publish a cryptographically attested dataset card. Developers
+              deposit bounties. On-chain identities are bound to hardware attestation keys.
+            </p>
+          </li>
+          <li class="step">
+            <span class="step__num">2</span>
+            <h3>Train locally</h3>
+            <p>
+              Each round, the coordinator ships model weights to enclaves on the provider
+              premises. Gradients are computed under DP, masked with secure-aggregation
+              shares, and attested by TEEs before leaving the site.
+            </p>
+          </li>
+          <li class="step">
+            <span class="step__num">3</span>
+            <h3>Aggregate &amp; attest</h3>
+            <p>
+              Byzantine-robust aggregation produces a new global model. A zkML circuit proves
+              that the training followed the agreed protocol. A commitment to every gradient
+              is anchored on-chain.
+            </p>
+          </li>
+          <li class="step">
+            <span class="step__num">4</span>
+            <h3>Settle fairly</h3>
+            <p>
+              Data Shapley ranks contributors by the marginal utility they brought. The reward
+              contract releases tokens (or fiat via an off-ramp) accordingly. Any party can
+              audit the ledger.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ================= USE CASES ================= -->
+    <section class="section" id="use-cases">
+      <div class="container">
+        <p class="eyebrow">Use cases</p>
+        <h2 class="section__title">Built for the hardest problems in ML-for-EDA.</h2>
+        <div class="grid grid--4">
+          <div class="usecase"><h3>DRC violation prediction</h3><p>GNN surrogate over routed netlists — hours-to-minutes design-rule feedback.</p></div>
+          <div class="usecase"><h3>Placement &amp; routing</h3><p>RL + GNN policies trained across diverse process corners and floorplans.</p></div>
+          <div class="usecase"><h3>PPA estimation</h3><p>Early-stage Power / Performance / Area estimators informed by real silicon data.</p></div>
+          <div class="usecase"><h3>Timing closure</h3><p>Regression models trained on multi-foundry timing reports — closure in fewer spins.</p></div>
+          <div class="usecase"><h3>RTL bug detection</h3><p>Transformer models fine-tuned on deidentified bug traces from production RTL.</p></div>
+          <div class="usecase"><h3>Logic synthesis</h3><p>Sequence-to-sequence models that learn synthesis scripts from expert ASIC flows.</p></div>
+          <div class="usecase"><h3>IR-drop &amp; EM</h3><p>U-Nets predicting power-grid hotspots from layout without exposing GDSII.</p></div>
+          <div class="usecase"><h3>DFT &amp; coverage</h3><p>Scan-chain insertion optimizers trained on aggregated DFT campaigns.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= AUDIENCE ================= -->
+    <section class="section section--dark" id="audience">
+      <div class="container">
+        <p class="eyebrow">For whom</p>
+        <h2 class="section__title">A two-sided network for the chip-design supply chain.</h2>
+        <div class="grid grid--2">
+          <article class="card card--outline">
+            <h3>Data providers</h3>
+            <p>Foundries, fabless IDMs, OSATs, and design-service houses with proprietary PDKs, netlists, layouts, and verification data.</p>
+            <ul class="card__bullets">
+              <li>Monetize dormant data without export</li>
+              <li>Hardware-attested data perimeter</li>
+              <li>Cryptographic audit of every use</li>
+              <li>Opt-in per task, per model, per round</li>
+            </ul>
+          </article>
+          <article class="card card--outline">
+            <h3>AI developers</h3>
+            <p>EDA startups, corporate AI teams, and academic labs building next-generation ML-for-EDA tools.</p>
+            <ul class="card__bullets">
+              <li>Train on industry-grade data, legally</li>
+              <li>No DIY federated-learning stack</li>
+              <li>Pay only for data that moved the metric</li>
+              <li>Deploy models back into production flows</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TEAM ================= -->
+    <section class="section" id="team">
+      <div class="container">
+        <p class="eyebrow">Team &amp; advisors</p>
+        <h2 class="section__title">Backed by the people who built Taiwan's EDA ecosystem.</h2>
+        <div class="grid grid--4">
+          <article class="person">
+            <p class="person__role">Founder &amp; CEO</p>
+            <h3 class="person__name">[Founder]</h3>
+            <p class="person__org">NTU CSIE '26 · NTU GIEE (EDA)</p>
+          </article>
+          <article class="person">
+            <p class="person__role">Advisor</p>
+            <h3 class="person__name">Prof. Shih-Wei Liao</h3>
+            <p class="person__org">National Taiwan University</p>
+            <p class="person__note">Blockchain systems, compilers, OceanBase.</p>
+          </article>
+          <article class="person">
+            <p class="person__role">Advisor</p>
+            <h3 class="person__name">Chen-Tsang Kao</h3>
+            <p class="person__org">Director, Hongli Semiconductor</p>
+            <p class="person__note">Foundry leadership &amp; industrial partnerships.</p>
+          </article>
+          <article class="person">
+            <p class="person__role">Advisor</p>
+            <h3 class="person__name">Prof. Yao-Wen Chang</h3>
+            <p class="person__org">NTU EE · EDA</p>
+            <p class="person__note">Global authority on physical design.</p>
+          </article>
+          <article class="person">
+            <p class="person__role">Advisor</p>
+            <h3 class="person__name">Prof. An-Yeu (Andy) Wu</h3>
+            <p class="person__org">NTU EE · Integrated Circuits &amp; Systems</p>
+            <p class="person__note">Signal processing, IC systems, AI accelerators.</p>
+          </article>
+          <article class="person person--placeholder">
+            <p class="person__role">We're hiring</p>
+            <h3 class="person__name">CTO / FL Lead</h3>
+            <p class="person__org">Federated learning, MLOps at scale</p>
+          </article>
+          <article class="person person--placeholder">
+            <p class="person__role">We're hiring</p>
+            <h3 class="person__name">Blockchain Lead</h3>
+            <p class="person__org">Smart contracts, zkML, tokenomics</p>
+          </article>
+          <article class="person person--placeholder">
+            <p class="person__role">We're hiring</p>
+            <h3 class="person__name">EDA Domain Lead</h3>
+            <p class="person__org">PD, verification, or synthesis flow experts</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section class="section section--cta" id="contact">
+      <div class="container container--narrow">
+        <p class="eyebrow">Get in touch</p>
+        <h2 class="section__title">Let's unlock the most valuable dataset in chip design.</h2>
+        <p class="section__lead">
+          We're actively partnering with foundries, fabless leaders, and EDA-AI research teams
+          ahead of a joint pilot in 2026. If that sounds like you, we should talk.
+        </p>
+        <div class="contact">
+          <a class="btn btn--primary" href="mailto:hello@kanesh.ai">hello@kanesh.ai</a>
+          <p class="contact__meta">Find us at <strong>Innovex 2026</strong> · Taipei · June 2, 2026</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <strong>Kanesh</strong>
+        <span>｜</span>
+        <span>卡納科技</span>
+      </div>
+      <p class="footer__tag">Data stays home. Value goes global.</p>
+      <p class="footer__copy">© 2026 Kanesh Technologies. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
