@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Kanesh — 90-Second Demo</title>
+  <meta name="description" content="See how Kanesh enables foundries to co-train EDA AI models without data ever leaving their premises." />
+  <meta name="theme-color" content="#0A1A33" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <style>
+    .demo-page {
+      min-height: 100vh;
+      padding: 120px 0 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .demo-video {
+      width: 100%;
+      max-width: 1080px;
+      margin: 48px auto 32px;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--line-strong);
+      background: var(--surface);
+    }
+
+    .demo-video iframe,
+    .demo-video .placeholder {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 0 40px;
+    }
+
+    .placeholder__play {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .placeholder__play::before {
+      content: '';
+      border-style: solid;
+      border-width: 16px 0 16px 26px;
+      border-color: transparent transparent transparent var(--accent-strong);
+      margin-left: 4px;
+    }
+    .placeholder__hint {
+      max-width: 440px;
+      line-height: 1.6;
+      font-size: 0.78rem;
+      color: var(--fg-faint);
+      text-transform: none;
+      letter-spacing: 0;
+      font-family: var(--font-sans);
+    }
+
+    .demo-cta-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .demo-meta {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (max-width: 700px) {
+      .demo-meta { grid-template-columns: 1fr; }
+    }
+
+    .demo-meta-item {
+      text-align: center;
+    }
+    .demo-meta-item strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+    }
+    .demo-meta-item span {
+      color: var(--fg-muted);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="nav" aria-label="Primary">
+    <div class="nav__inner">
+      <a href="../" class="brand" aria-label="Kanesh home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <defs>
+              <linearGradient id="gx" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#D4AA6F"/>
+                <stop offset="1" stop-color="#B08D57"/>
+              </linearGradient>
+            </defs>
+            <rect x="3" y="3" width="26" height="26" rx="5" fill="none" stroke="url(#gx)" stroke-width="2"/>
+            <path d="M10 10 L10 22 M10 16 L22 16 M22 10 L22 22" stroke="url(#gx)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <circle cx="16" cy="16" r="2.2" fill="url(#gx)"/>
+          </svg>
+        </span>
+        <span class="brand__word">Kanesh</span>
+      </a>
+      <ul class="nav__links">
+        <li><a href="../">← Back to homepage</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main" class="demo-page">
+    <div class="container">
+      <div style="text-align:center;">
+        <p class="eyebrow">90-second demo</p>
+        <h1 class="hero__title">
+          <span class="hero__title-main">See Kanesh</span>
+          <span class="hero__title-accent">in motion.</span>
+        </h1>
+        <p class="hero__subtitle" style="max-width: 680px; margin: 24px auto 0;">
+          Watch how three foundries co-train an EDA AI model — without a single byte of raw data ever leaving their premises. And how every contributor gets paid, fairly and automatically.
+        </p>
+      </div>
+
+      <div class="demo-video">
+        <!--
+          ============================================================
+          REPLACE THIS PLACEHOLDER WITH YOUTUBE EMBED AFTER UPLOAD.
+          See ./RECORD.md for the full upload + embed checklist.
+          Embed snippet (uncomment and replace VIDEO_ID):
+        ============================================================
+
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/VIDEO_ID?rel=0&modestbranding=1&playsinline=1"
+          title="Kanesh — 90-second demo"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy">
+        </iframe>
+        -->
+
+        <div class="placeholder" role="status" aria-label="Video pending upload">
+          <div class="placeholder__play" aria-hidden="true"></div>
+          <div>YouTube embed pending</div>
+          <div class="placeholder__hint">Recording SOP and storyboard live in <code>./RECORD.md</code>. Once the video is uploaded as <strong>Unlisted</strong>, swap the placeholder for the YouTube iframe in <code>demo/index.html</code>.</div>
+        </div>
+      </div>
+
+      <div class="demo-cta-row">
+        <a class="btn btn--primary" href="interactive/">Try interactive demo →</a>
+        <a class="btn btn--ghost" href="../#contact">Partner with us</a>
+      </div>
+
+      <dl class="demo-meta">
+        <div class="demo-meta-item">
+          <strong>Duration</strong>
+          <span>90 seconds</span>
+        </div>
+        <div class="demo-meta-item">
+          <strong>Best viewed</strong>
+          <span>Full screen, audio on</span>
+        </div>
+        <div class="demo-meta-item">
+          <strong>Want to step through?</strong>
+          <span>Use the interactive demo →</span>
+        </div>
+      </dl>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <strong>Kanesh</strong>
+        <span>｜</span>
+        <span>卡納科技</span>
+      </div>
+      <p class="footer__tag">Data stays home. Value goes global.</p>
+      <p class="footer__copy">© 2026 Kanesh Technologies. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
