@@ -69,24 +69,25 @@
       pointer-events: none;
     }
 
-    /* Caption banner at top */
+    /* Caption banner at top — z-index above sticky nav (which is 50) */
     .caption {
       position: absolute;
-      top: 28px;
+      top: 80px;
       left: 50%;
       transform: translateX(-50%);
       max-width: 640px;
       padding: 12px 24px;
-      background: rgba(10, 26, 51, 0.72);
+      background: rgba(10, 26, 51, 0.85);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--line-strong);
+      border: 1px solid var(--accent-strong);
       border-radius: 999px;
       font-size: 0.98rem;
       color: var(--fg-strong);
       text-align: center;
-      z-index: 10;
+      z-index: 60;
       transition: opacity 0.3s var(--ease);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     /* ============== Three actor columns ============== */
@@ -96,7 +97,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       align-items: center;
-      padding: 96px 60px 60px;
+      padding: 160px 60px 60px;
       gap: 30px;
     }
 
