@@ -89,12 +89,15 @@
     // Helper to fly a packet from anchor A → anchor B.
     // Packet PERSISTS at destination — explicit fade-outs are scheduled at scene
     // boundaries below so each pause point shows a clean snapshot of state.
+    // opts.offsetX / opts.offsetY → final position is toEl center + offset.
     function flyPacket(packetId, fromEl, toEl, opts = {}) {
       const el = $('#' + packetId);
       const from = rectIn(fromEl);
       const to = rectIn(toEl);
+      const targetCx = to.cx + (opts.offsetX || 0);
+      const targetCy = to.cy + (opts.offsetY || 0);
       const start = placeCentered(el, from.cx, from.cy);
-      const end = placeCentered(el, to.cx, to.cy);
+      const end = placeCentered(el, targetCx, targetCy);
       const tlLocal = gsap.timeline();
       tlLocal.set(el, { x: start.x, y: start.y, opacity: 0 });
       tlLocal.to(el, { opacity: 1, duration: 0.25 });
@@ -149,24 +152,71 @@
       Object.values(vaults).forEach(v => v.classList.remove('training'));
     }, [], 33);
 
-    // 3 gradients fly back to platform
-    tl.add(flyPacket('p-grad-1', vaults.dp1, platform, { duration: 1.6 }), 34);
-    tl.add(flyPacket('p-grad-2', vaults.dp2,  platform, { duration: 1.6 }), 34.3);
-    tl.add(flyPacket('p-grad-3', vaults.dp3,  platform, { duration: 1.6 }), 34.6);
+    // 3 gradients fly back to platform — but land in a VERTICAL QUEUE just left
+    // of the platform, so user can see "3 separate encrypted gradients arrived".
+    // Scene 7 will then visibly converge them into one trained model.
+    const GRAD_DX = -150;   // 150 px left of platform center (in the gap)
+    const GRAD_DY = 42;     // vertical spacing between stacked gradients
+    tl.add(flyPacket('p-grad-1', vaults.dp1, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: -GRAD_DY }), 34);
+    tl.add(flyPacket('p-grad-2', vaults.dp2, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: 0          }), 34.3);
+    tl.add(flyPacket('p-grad-3', vaults.dp3, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: GRAD_DY    }), 34.6);
 
-    // ===== Scene 7 (t=44): Platform aggregates — pulse =====
+    // ===== Scene 7 (t=44): Aggregation — 3 gradients converge into platform, become trained model =====
     tl.call(() => $('#platform').classList.add('aggregating'), [], 44);
     tl.fromTo(platform,
       { scale: 1.04 },
       { scale: 1.08, duration: 0.5, yoyo: true, repeat: 3, ease: 'sine.inOut' },
       44
     );
-    // Hide shields after aggregation
+
+    // Pre-compute platform-center coords for converging packets
+    const platformRectAtBuild = rectIn(platform);
+    const gradEl = $('#p-grad-1');
+    const gradW = gradEl.getBoundingClientRect().width  || 110;
+    const gradH = gradEl.getBoundingClientRect().height || 32;
+    const mergeX = platformRectAtBuild.cx - gradW / 2;
+    const mergeY = platformRectAtBuild.cy - gradH / 2;
+
+    // 3 gradients slide rightward into platform center (1.5 s)
+    tl.to(['#p-grad-1', '#p-grad-2', '#p-grad-3'], {
+      x: mergeX,
+      y: mergeY,
+      duration: 1.5,
+      ease: 'power2.in',
+    }, 44);
+
+    // Brief overlap moment — all 3 stacked at center for 0.2 s, visible
+    // (no animation in the gap; they hold position and opacity)
+
+    // Gradients fade as the trained model emerges (45.7 → 46.1)
+    tl.to(['#p-grad-1', '#p-grad-2', '#p-grad-3'], { opacity: 0, duration: 0.4 }, 45.7);
+
+    // Trained model packet pops into existence at platform center
+    const mfEl = $('#p-model-final');
+    const mfW = mfEl.getBoundingClientRect().width  || 130;
+    const mfH = mfEl.getBoundingClientRect().height || 32;
+    const mfX = platformRectAtBuild.cx - mfW / 2;
+    const mfY = platformRectAtBuild.cy - mfH / 2;
+    tl.set('#p-model-final', { x: mfX, y: mfY, scale: 0.5 }, 45.8);
+    tl.to('#p-model-final', { opacity: 1, scale: 1.18, duration: 0.45, ease: 'back.out(2)' }, 45.8);
+    tl.to('#p-model-final', { scale: 1, duration: 0.3 }, 46.3);
+
+    // Hide shields after merge complete
     tl.to('#shields', { opacity: 0, duration: 0.4 }, 47);
     tl.call(() => $('#platform').classList.remove('aggregating'), [], 48);
 
     // ===== Scene 8 (t=52): Trained model → Developer =====
-    tl.add(flyPacket('p-model-final', platform, developer, { duration: 1.6 }), 52);
+    // Direct tween (NOT flyPacket) so the packet continues from its visible
+    // platform-center position instead of resetting to invisible.
+    const developerRectAtBuild = rectIn(developer);
+    const devEndX = developerRectAtBuild.cx - mfW / 2;
+    const devEndY = developerRectAtBuild.cy - mfH / 2;
+    tl.to('#p-model-final', {
+      x: devEndX,
+      y: devEndY,
+      duration: 1.6,
+      ease: 'power2.inOut',
+    }, 52);
     tl.call(() => $('#developer').classList.add('deployed'), [], 53.5);
 
     // ===== Scheduled fade-outs at scene boundaries =====
@@ -174,7 +224,7 @@
     // only when the NEXT scene's action begins, so user has time to read.
     tl.to('#p-bounty', { opacity: 0, duration: 0.4 }, 15.7);                                  // before scene 4 (models fly)
     tl.to(['#p-model-1', '#p-model-2', '#p-model-3'], { opacity: 0, duration: 0.4 }, 33.5);   // before scene 6 (gradients fly back)
-    tl.to(['#p-grad-1', '#p-grad-2', '#p-grad-3'],   { opacity: 0, duration: 0.5 }, 46);     // during scene 7 aggregation (gradients consumed)
+    // (gradient fade is now part of scene 7 aggregation choreography above)
     // Trained model + money packets + earnings → stay visible as the final summary frame
 
     // ===== Scene 9 (t=60): $$$ flows back, proportional =====
