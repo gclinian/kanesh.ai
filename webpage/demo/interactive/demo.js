@@ -244,27 +244,18 @@
   }
 
   // -----------------------------------------------------------
-  // Caption updater (with fade)
+  // Caption updater — set text immediately, then animate a fade-in pulse.
+  // No lock: rapid scene crossings always reflect the latest scene's caption.
   // -----------------------------------------------------------
-  let _capLock = false;
   function updateCaption(text, num) {
     const cap = $('#caption');
     const sceneNum = $('#scene-num');
     sceneNum.textContent = num;
-    if (_capLock) return;
-    _capLock = true;
-    gsap.to(cap, {
-      opacity: 0,
-      duration: 0.25,
-      onComplete: () => {
-        cap.textContent = text;
-        gsap.to(cap, {
-          opacity: 1,
-          duration: 0.35,
-          onComplete: () => { _capLock = false; },
-        });
-      },
-    });
+    cap.textContent = text;
+    gsap.fromTo(cap,
+      { y: 8, opacity: 0.35 },
+      { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out', overwrite: true }
+    );
   }
 
   // -----------------------------------------------------------
