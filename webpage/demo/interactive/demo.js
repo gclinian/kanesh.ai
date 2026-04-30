@@ -86,7 +86,9 @@
       gsap.set(el, { x: c.x, y: c.y, opacity: 0 });
     }
 
-    // Helper to fly a packet from anchor A → anchor B
+    // Helper to fly a packet from anchor A → anchor B.
+    // Packet PERSISTS at destination — explicit fade-outs are scheduled at scene
+    // boundaries below so each pause point shows a clean snapshot of state.
     function flyPacket(packetId, fromEl, toEl, opts = {}) {
       const el = $('#' + packetId);
       const from = rectIn(fromEl);
@@ -102,7 +104,7 @@
         duration: opts.duration ?? 1.2,
         ease: opts.ease ?? 'power2.inOut',
       }, '-=0.05');
-      tlLocal.to(el, { opacity: 0, duration: 0.25 }, '+=0.1');
+      // No auto fade-out — caller schedules a fade at the next scene boundary.
       return tlLocal;
     }
 
@@ -166,6 +168,14 @@
     // ===== Scene 8 (t=52): Trained model → Developer =====
     tl.add(flyPacket('p-model-final', platform, developer, { duration: 1.6 }), 52);
     tl.call(() => $('#developer').classList.add('deployed'), [], 53.5);
+
+    // ===== Scheduled fade-outs at scene boundaries =====
+    // Each pause point shows the END STATE of that scene; old packets fade out
+    // only when the NEXT scene's action begins, so user has time to read.
+    tl.to('#p-bounty', { opacity: 0, duration: 0.4 }, 15.7);                                  // before scene 4 (models fly)
+    tl.to(['#p-model-1', '#p-model-2', '#p-model-3'], { opacity: 0, duration: 0.4 }, 33.5);   // before scene 6 (gradients fly back)
+    tl.to(['#p-grad-1', '#p-grad-2', '#p-grad-3'],   { opacity: 0, duration: 0.5 }, 46);     // during scene 7 aggregation (gradients consumed)
+    // Trained model + money packets + earnings → stay visible as the final summary frame
 
     // ===== Scene 9 (t=60): $$$ flows back, proportional =====
     // Money flies developer → kanesh → vaults (in sequence, different sizes already encoded in label)
