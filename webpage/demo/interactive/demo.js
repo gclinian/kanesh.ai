@@ -17,15 +17,16 @@
     { t: 5,  num: 2, text: 'An AI developer posts a training job to Kanesh, with a bounty.' },
     { t: 16, num: 3, text: 'Kanesh sends the model — never asks for the data.' },
     { t: 22, num: 4, text: 'Training happens where the data lives. Inside the vault. Always.' },
-    { t: 32, num: 5, text: 'Only encrypted gradients leave — protected by 5 cryptographic layers.' },
-    { t: 44, num: 6, text: 'Kanesh aggregates. The model gets stronger with every contribution.' },
-    { t: 52, num: 7, text: 'The developer gets a model trained on industry-grade data — legally.' },
-    { t: 60, num: 8, text: 'A customer pays the AI developer. Kanesh routes the revenue to providers proportionally.' },
-    { t: 67, num: 9, text: 'Every customer payment auto-flows. Recurring revenue, no extra action needed.' },
+    { t: 32, num: 5, text: 'Differential Privacy: gradients carry calibrated noise — raw data cannot be reverse-engineered.' },
+    { t: 38, num: 6, text: 'Secure Aggregation: the coordinator sees gradients arrive, but can\'t read individual values.' },
+    { t: 50, num: 7, text: 'Kanesh aggregates. The model gets stronger with every contribution.' },
+    { t: 58, num: 8, text: 'The developer gets a model trained on industry-grade data — legally.' },
+    { t: 66, num: 9, text: 'A customer pays the AI developer. Kanesh routes the revenue to providers proportionally.' },
+    { t: 73, num: 10, text: 'Every customer payment auto-flows. Recurring revenue, no extra action needed.' },
   ];
 
-  const TOTAL_DURATION = 75; // timeline-time seconds (not wall-clock)
-  const SPEED = 3;            // 3× faster — wall-clock duration ≈ 75/3 = 25 s
+  const TOTAL_DURATION = 80; // timeline-time seconds (not wall-clock)
+  const SPEED = 3;            // 3× faster — wall-clock duration ≈ 80/3 ≈ 26.7 s
 
   // -----------------------------------------------------------
   // Position helpers (relative to canvas)
@@ -82,10 +83,10 @@
     // Security visualization elements
     const attackerEl = $('#attacker-icon');
     const teeTag = $('#tee-tag');
-    const dpTag = $('#dp-tag');
-    const saQuestion = $('#sa-question');
     const saSigma = $('#sa-sigma');
     const saTag = $('#sa-tag');
+    const dpVignette = $('#dp-vignette');
+    const dpRowFail = dpVignette.querySelector('.dp-row-fail');
 
     // Place every packet at platform center initially (will fade in/move from there)
     function resetPacket(id, anchor = platform) {
@@ -167,75 +168,75 @@
     }, 25.85);
     // Bounce back
     tl.to(attackerEl, { x: v2r.x - 130, duration: 0.55, ease: 'back.out(2)' }, 25.9);
-    // "TEE blocks breach" tag
+    // "TEE blocks breach" tag — stays visible through end of training
+    // so the user can read it at the scene-4 pause point.
     tl.set(teeTag, { x: v2r.x - 145, y: v2r.cy + 32, opacity: 0 }, 26);
     tl.to(teeTag, { opacity: 1, duration: 0.3 }, 26);
-    tl.to(teeTag, { opacity: 0, duration: 0.3 }, 28.5);
+    tl.to(teeTag, { opacity: 0, duration: 0.4 }, 32);   // fades when DP scene begins
     tl.to(attackerEl, { opacity: 0, duration: 0.3 }, 26.6);
 
-    // ===== Scene 6 (t=32): Encrypted gradients flow back, shields light up =====
-    // Show shields container
-    tl.to('#shields', { opacity: 1, duration: 0.4 }, 32);
-    // Light shields one by one
-    const shieldEls = $$('.shield');
-    shieldEls.forEach((sh, i) => {
-      tl.call(() => sh.classList.add('lit'), [], 32 + i * 0.4);
-    });
     // Stop training glow + remove training class + deactivate TEE perimeter
+    // (now happens at scene-4 → scene-5 boundary, t=32, so vaults look "static" in DP scene)
     tl.call(() => {
       Object.values(vaults).forEach(v => {
         v.classList.remove('training');
         v.classList.remove('tee-active');
       });
-    }, [], 33);
+    }, [], 32);
 
-    // 3 gradients fly back to platform — but land in a VERTICAL QUEUE just left
-    // of the platform, so user can see "3 separate encrypted gradients arrived".
-    // Scene 7 will then visibly converge them into one trained model.
+    // ===== Scene 5 (t=32–37.5): DIFFERENTIAL PRIVACY vignette =====
+    // Diagram: "Data + ε noise → ∇W" works (forward), but "∇W → Data" fails (reverse).
+    // Visualizes that calibrated noise prevents reverse-engineering of raw data.
+    tl.set(dpVignette, { opacity: 0 }, 32);
+    tl.to(dpVignette, { opacity: 1, duration: 0.5 }, 32.3);
+    // Reverse-failure row pulses in 1.5 s after the forward row settles
+    tl.call(() => dpRowFail.classList.add('show'), [], 34);
+    tl.fromTo('.dp-box.dp-fail',
+      { scale: 0.7 },
+      { scale: 1.18, duration: 0.4, ease: 'back.out(2)' },
+      34
+    );
+    tl.to('.dp-box.dp-fail', { scale: 1, duration: 0.3 }, 34.4);
+    // Vignette stays visible at pause (37.5); fades when next scene begins (~38)
+    tl.to(dpVignette, { opacity: 0, duration: 0.5 }, 38.0);
+    tl.call(() => dpRowFail.classList.remove('show'), [], 38.5);
+
+    // ===== Scene 6 (t=38–49.5): Encrypted gradients flow back; SA "?" on each =====
+    // 3 gradients fly back to platform — vertical queue just left of platform
     const GRAD_DX = -150;   // 150 px left of platform center (in the gap)
     const GRAD_DY = 42;     // vertical spacing between stacked gradients
-    tl.add(flyPacket('p-grad-1', vaults.dp1, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: -GRAD_DY }), 34);
-    tl.add(flyPacket('p-grad-2', vaults.dp2, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: 0          }), 34.3);
-    tl.add(flyPacket('p-grad-3', vaults.dp3, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: GRAD_DY    }), 34.6);
+    tl.add(flyPacket('p-grad-1', vaults.dp1, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: -GRAD_DY }), 40);
+    tl.add(flyPacket('p-grad-2', vaults.dp2, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: 0          }), 40.3);
+    tl.add(flyPacket('p-grad-3', vaults.dp3, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: GRAD_DY    }), 40.6);
 
-    // ▶ DP visualization — gradients carry visible noise dust while in flight.
-    // Visualizes: the gradient is calibrated-noisy, so raw data can't be reverse-engineered.
+    // DP noise effect during flight (purple particle halo around each ∇W)
     tl.call(() => {
       ['p-grad-1', 'p-grad-2', 'p-grad-3'].forEach(id => $('#' + id).classList.add('dp-noisy'));
-    }, [], 34);
-    // DP tag flashes mid-flight
-    const dpTagX = (v2r.cx + platR.cx) / 2 - 95;
-    const dpTagY = platR.y - 18;
-    tl.set(dpTag, { x: dpTagX, y: dpTagY, opacity: 0 }, 35);
-    tl.to(dpTag, { opacity: 1, duration: 0.3 }, 35);
-    tl.to(dpTag, { opacity: 0, duration: 0.3 }, 37.5);
-    // Drop dp-noisy when gradients have arrived at queue (they look "settled")
+    }, [], 40);
     tl.call(() => {
       ['p-grad-1', 'p-grad-2', 'p-grad-3'].forEach(id => $('#' + id).classList.remove('dp-noisy'));
-    }, [], 36.5);
+    }, [], 42.5);
 
-    // ▶ SA visualization — "?" appears above Kanesh as gradients queue up,
-    // signalling the coordinator can see them but can't read individual values.
-    tl.set(saQuestion, { x: platR.cx - 18, y: platR.y - 60, opacity: 0, scale: 0.6 }, 41);
-    tl.to(saQuestion, { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)' }, 41);
-    tl.set(saTag, { x: platR.cx - 145, y: platR.y - 96, opacity: 0 }, 41.4);
-    tl.to(saTag, { opacity: 1, duration: 0.3 }, 41.4);
+    // ▶ SA visualization — "?" badge appears on EACH gradient packet:
+    // visualizes that the coordinator sees them arrive but can't read individual values.
+    tl.call(() => {
+      ['p-grad-1', 'p-grad-2', 'p-grad-3'].forEach(id => $('#' + id).classList.add('sa-unknown'));
+    }, [], 43);
 
-    // ===== Scene 7 (t=44): Aggregation — 3 gradients converge into platform, become trained model =====
-    // ▶ SA continued: "?" → "Σ" visually shows the coordinator only knows the SUM.
-    tl.to(saQuestion, { opacity: 0, scale: 0.6, duration: 0.4 }, 44.6);
-    tl.set(saSigma, { x: platR.cx - 16, y: platR.y - 56, opacity: 0, scale: 0.5 }, 45.0);
-    tl.to(saSigma, { opacity: 1, scale: 1.2, duration: 0.5, ease: 'back.out(2)' }, 45.0);
-    tl.to(saSigma, { scale: 1, duration: 0.3 }, 45.5);
-    // Σ + tag fade as the trained model emerges
-    tl.to(saSigma, { opacity: 0, duration: 0.4 }, 46.5);
-    tl.to(saTag, { opacity: 0, duration: 0.3 }, 46.7);
+    // SA tag near platform top
+    tl.set(saTag, { x: platR.cx - 145, y: platR.y - 50, opacity: 0 }, 43.5);
+    tl.to(saTag, { opacity: 1, duration: 0.3 }, 43.5);
 
-    tl.call(() => $('#platform').classList.add('aggregating'), [], 44);
+    // ===== Scene 7 (t=50): Aggregation — 3 ∇W converge into platform, become trained model =====
+    // ▶ SA continued: as ∇W converge into Σ, "?" badges drop and only the SUM is revealed.
+    tl.call(() => {
+      ['p-grad-1', 'p-grad-2', 'p-grad-3'].forEach(id => $('#' + id).classList.remove('sa-unknown'));
+    }, [], 50);
+    tl.call(() => $('#platform').classList.add('aggregating'), [], 50);
     tl.fromTo(platform,
       { scale: 1.04 },
       { scale: 1.08, duration: 0.5, yoyo: true, repeat: 3, ease: 'sine.inOut' },
-      44
+      50
     );
 
     // Pre-compute platform-center coords for converging packets
@@ -252,13 +253,15 @@
       y: mergeY,
       duration: 1.5,
       ease: 'power2.in',
-    }, 44);
+    }, 50);
 
-    // Brief overlap moment — all 3 stacked at center for 0.2 s, visible
-    // (no animation in the gap; they hold position and opacity)
+    // Σ symbol pops in (replaces the "?"s) — the only thing the coordinator knows
+    tl.set(saSigma, { x: platformRectAtBuild.cx - 16, y: platformRectAtBuild.y - 56, opacity: 0, scale: 0.5 }, 51.0);
+    tl.to(saSigma, { opacity: 1, scale: 1.2, duration: 0.5, ease: 'back.out(2)' }, 51.0);
+    tl.to(saSigma, { scale: 1, duration: 0.3 }, 51.5);
 
-    // Gradients fade as the trained model emerges (45.7 → 46.1)
-    tl.to(['#p-grad-1', '#p-grad-2', '#p-grad-3'], { opacity: 0, duration: 0.4 }, 45.7);
+    // Gradients fade as the trained model emerges
+    tl.to(['#p-grad-1', '#p-grad-2', '#p-grad-3'], { opacity: 0, duration: 0.4 }, 51.7);
 
     // Trained model packet pops into existence at platform center
     const mfEl = $('#p-model-final');
@@ -266,15 +269,16 @@
     const mfH = mfEl.getBoundingClientRect().height || 32;
     const mfX = platformRectAtBuild.cx - mfW / 2;
     const mfY = platformRectAtBuild.cy - mfH / 2;
-    tl.set('#p-model-final', { x: mfX, y: mfY, scale: 0.5 }, 45.8);
-    tl.to('#p-model-final', { opacity: 1, scale: 1.18, duration: 0.45, ease: 'back.out(2)' }, 45.8);
-    tl.to('#p-model-final', { scale: 1, duration: 0.3 }, 46.3);
+    tl.set('#p-model-final', { x: mfX, y: mfY, scale: 0.5 }, 51.8);
+    tl.to('#p-model-final', { opacity: 1, scale: 1.18, duration: 0.45, ease: 'back.out(2)' }, 51.8);
+    tl.to('#p-model-final', { scale: 1, duration: 0.3 }, 52.3);
 
-    // Hide shields after merge complete
-    tl.to('#shields', { opacity: 0, duration: 0.4 }, 47);
-    tl.call(() => $('#platform').classList.remove('aggregating'), [], 48);
+    // Σ + SA tag fade as the trained model fully emerges
+    tl.to(saSigma, { opacity: 0, duration: 0.4 }, 52.5);
+    tl.to(saTag, { opacity: 0, duration: 0.3 }, 52.7);
+    tl.call(() => $('#platform').classList.remove('aggregating'), [], 54);
 
-    // ===== Scene 8 (t=52): Trained model → Developer =====
+    // ===== Scene 8 (t=58): Trained model → Developer =====
     // Direct tween (NOT flyPacket) so the packet continues from its visible
     // platform-center position instead of resetting to invisible.
     const developerRectAtBuild = rectIn(developer);
@@ -285,95 +289,88 @@
       y: devEndY,
       duration: 1.6,
       ease: 'power2.inOut',
-    }, 52);
-    tl.call(() => $('#developer').classList.add('deployed'), [], 53.5);
+    }, 58);
+    tl.call(() => $('#developer').classList.add('deployed'), [], 59.5);
 
     // ===== Scheduled fade-outs at scene boundaries =====
-    // Each pause point shows the END STATE of that scene; old packets fade out
-    // only when the NEXT scene's action begins, so user has time to read.
     tl.to('#p-bounty', { opacity: 0, duration: 0.4 }, 15.7);                                  // before scene 4 (models fly)
-    tl.to(['#p-model-1', '#p-model-2', '#p-model-3'], { opacity: 0, duration: 0.4 }, 33.5);   // before scene 6 (gradients fly back)
-    // (gradient fade is now part of scene 7 aggregation choreography above)
+    tl.to(['#p-model-1', '#p-model-2', '#p-model-3'], { opacity: 0, duration: 0.4 }, 39.5);   // before scene 6 (gradients fly back)
     // Trained model + money packets + earnings → stay visible as the final summary frame
 
-    // ===== Scene 8 (t=60): $$$ flow — Customer → Developer → Kanesh → 3 Providers =====
-    // Phase A (60.0–61.0): A customer pays the AI Developer
-    tl.call(() => customers.classList.add('active'), [], 60);
-    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 1.0 }), 60);
+    // ===== Scene 9 (t=66): $$$ flow — Customer → Developer → Kanesh → 3 Providers =====
+    // Phase A (66.0–67.0): A customer pays the AI Developer
+    tl.call(() => customers.classList.add('active'), [], 66);
+    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 1.0 }), 66);
 
-    // Phase B (61.0–61.5): Developer briefly pulses (payment received), customer-pay fades
+    // Phase B (67.0–67.5): Developer briefly pulses (payment received), customer-pay fades
     tl.fromTo(developer,
       { scale: 1 },
       { scale: 1.06, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' },
-      61.0
+      67.0
     );
-    tl.to('#p-customer-pay', { opacity: 0, duration: 0.3 }, 61.2);
-    tl.call(() => customers.classList.remove('active'), [], 61.5);
+    tl.to('#p-customer-pay', { opacity: 0, duration: 0.3 }, 67.2);
+    tl.call(() => customers.classList.remove('active'), [], 67.5);
 
-    // Phase C (61.5–62.7): Developer forwards Payment to Kanesh
-    tl.add(flyPacket('p-revenue', developer, platform, { duration: 1.2 }), 61.5);
+    // Phase C (67.5–68.7): Developer forwards Payment to Kanesh
+    tl.add(flyPacket('p-revenue', developer, platform, { duration: 1.2 }), 67.5);
 
-    // Phase D (62.8–63.2): "Split" moment at Kanesh
+    // Phase D (68.8–69.2): "Split" moment at Kanesh
     tl.to('#p-revenue', {
       scale: 1.3,
       duration: 0.25,
       yoyo: true,
       repeat: 1,
       ease: 'sine.inOut',
-    }, 62.8);
+    }, 68.8);
     tl.fromTo(platform,
       { scale: 1.04 },
       { scale: 1.1, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' },
-      63.0
+      69.0
     );
-    tl.to('#p-revenue', { opacity: 0, duration: 0.3 }, 63.2);
+    tl.to('#p-revenue', { opacity: 0, duration: 0.3 }, 69.2);
 
-    // Phase E (63.3–64.7): 3 money packets emerge from Kanesh and fly to each provider
-    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 1.4 }), 63.3);
-    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 1.4 }), 63.5);
-    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 1.4 }), 63.7);
+    // Phase E (69.3–70.7): 3 money packets emerge from Kanesh and fly to each provider
+    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 1.4 }), 69.3);
+    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 1.4 }), 69.5);
+    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 1.4 }), 69.7);
 
-    // Phase F (64.7–65.1): earnings labels appear as money arrives
-    tl.call(() => $('#earn-1').classList.add('show'), [], 64.7);
-    tl.call(() => $('#earn-2').classList.add('show'),  [], 64.9);
-    tl.call(() => $('#earn-3').classList.add('show'),  [], 65.1);
+    // Phase F (70.7–71.1): earnings labels appear as money arrives
+    tl.call(() => $('#earn-1').classList.add('show'), [], 70.7);
+    tl.call(() => $('#earn-2').classList.add('show'),  [], 70.9);
+    tl.call(() => $('#earn-3').classList.add('show'),  [], 71.1);
 
-    // ===== Scene 9 (t=67): Recurring revenue — 2 quick payment cycles =====
-    // Each cycle reuses the same packets via flyPacket (which set+resets each call).
-    // Compress the full chain into ~2 s per cycle so user feels the rhythm.
+    // ===== Scene 10 (t=73): Recurring revenue — 2 quick payment cycles =====
+    // ---------- Cycle 1 (t=73.0 → 74.6) ----------
+    tl.call(() => customers.classList.add('active'), [], 73.0);
+    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 0.5 }), 73.0);
+    tl.fromTo(developer, { scale: 1 }, { scale: 1.04, duration: 0.2, yoyo: true, repeat: 1 }, 73.4);
+    tl.to('#p-customer-pay', { opacity: 0, duration: 0.2 }, 73.5);
+    tl.call(() => customers.classList.remove('active'), [], 73.7);
 
-    // ---------- Cycle 1 (t=67.0 → 68.6) ----------
-    tl.call(() => customers.classList.add('active'), [], 67.0);
-    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 0.5 }), 67.0);
-    tl.fromTo(developer, { scale: 1 }, { scale: 1.04, duration: 0.2, yoyo: true, repeat: 1 }, 67.4);
-    tl.to('#p-customer-pay', { opacity: 0, duration: 0.2 }, 67.5);
-    tl.call(() => customers.classList.remove('active'), [], 67.7);
+    tl.add(flyPacket('p-revenue', developer, platform, { duration: 0.5 }), 73.6);
+    tl.to('#p-revenue', { opacity: 0, duration: 0.2 }, 74.1);
+    tl.fromTo(platform, { scale: 1.04 }, { scale: 1.07, duration: 0.2, yoyo: true, repeat: 1 }, 74.0);
 
-    tl.add(flyPacket('p-revenue', developer, platform, { duration: 0.5 }), 67.6);
-    tl.to('#p-revenue', { opacity: 0, duration: 0.2 }, 68.1);
-    tl.fromTo(platform, { scale: 1.04 }, { scale: 1.07, duration: 0.2, yoyo: true, repeat: 1 }, 68.0);
+    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 0.6 }), 74.2);
+    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 0.6 }), 74.3);
+    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 0.6 }), 74.4);
+    tl.fromTo('.earnings.show', { scale: 1 }, { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1 }, 74.9);
 
-    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 0.6 }), 68.2);
-    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 0.6 }), 68.3);
-    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 0.6 }), 68.4);
-    // Earnings labels pulse to acknowledge another payment received
-    tl.fromTo('.earnings.show', { scale: 1 }, { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1 }, 68.9);
+    // ---------- Cycle 2 (t=76.0 → 77.6) ----------
+    tl.call(() => customers.classList.add('active'), [], 76.0);
+    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 0.5 }), 76.0);
+    tl.fromTo(developer, { scale: 1 }, { scale: 1.04, duration: 0.2, yoyo: true, repeat: 1 }, 76.4);
+    tl.to('#p-customer-pay', { opacity: 0, duration: 0.2 }, 76.5);
+    tl.call(() => customers.classList.remove('active'), [], 76.7);
 
-    // ---------- Cycle 2 (t=70.0 → 71.6) ----------
-    tl.call(() => customers.classList.add('active'), [], 70.0);
-    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 0.5 }), 70.0);
-    tl.fromTo(developer, { scale: 1 }, { scale: 1.04, duration: 0.2, yoyo: true, repeat: 1 }, 70.4);
-    tl.to('#p-customer-pay', { opacity: 0, duration: 0.2 }, 70.5);
-    tl.call(() => customers.classList.remove('active'), [], 70.7);
+    tl.add(flyPacket('p-revenue', developer, platform, { duration: 0.5 }), 76.6);
+    tl.to('#p-revenue', { opacity: 0, duration: 0.2 }, 77.1);
+    tl.fromTo(platform, { scale: 1.04 }, { scale: 1.07, duration: 0.2, yoyo: true, repeat: 1 }, 77.0);
 
-    tl.add(flyPacket('p-revenue', developer, platform, { duration: 0.5 }), 70.6);
-    tl.to('#p-revenue', { opacity: 0, duration: 0.2 }, 71.1);
-    tl.fromTo(platform, { scale: 1.04 }, { scale: 1.07, duration: 0.2, yoyo: true, repeat: 1 }, 71.0);
-
-    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 0.6 }), 71.2);
-    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 0.6 }), 71.3);
-    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 0.6 }), 71.4);
-    tl.fromTo('.earnings.show', { scale: 1 }, { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1 }, 71.9);
+    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 0.6 }), 77.2);
+    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 0.6 }), 77.3);
+    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 0.6 }), 77.4);
+    tl.fromTo('.earnings.show', { scale: 1 }, { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1 }, 77.9);
 
     // ===== End (final summary frame holds visible: model at dev, money at vaults) =====
 
@@ -441,10 +438,10 @@
   // Step boundaries: each Next advances to the END of one scene's animated action.
   // Scene 1 is a static intro (no animation), so we skip its end-marker — first Next
   // jumps straight to end of Scene 2 (developer pulse). 8 Next clicks total = 8 actions.
-  // 8 step-throughs aligned with the 8 ACTION scenes (skip static intro):
-  //   end of merged scene 2, then scenes 3, 4, 5, 6, 7, 8 (cust→dev→kanesh→prov),
-  //   and 9 (recurring).
-  const PAUSE_POINTS = [15.5, 21.5, 31.5, 43.5, 51.5, 59.5, 66, 73];
+  // 9 step-throughs aligned with the 9 ACTION scenes (skip static intro):
+  //   2(merged), 3(models), 4(training), 5(DP), 6(grads+SA), 7(aggregation),
+  //   8(model→dev), 9(customer), 10(recurring).
+  const PAUSE_POINTS = [15.5, 21.5, 31.5, 37.5, 49.5, 57.5, 65.5, 72, 80];
 
   const playBtn = $('#play');
   const nextBtn = $('#next');
@@ -476,10 +473,15 @@
     $$('.packet').forEach(p => {
       gsap.set(p, { opacity: 0 });
       p.classList.remove('dp-noisy');
+      p.classList.remove('sa-unknown');
     });
     gsap.set('#shields', { opacity: 0 });
+    // Reset DP vignette + its row state
+    gsap.set('#dp-vignette', { opacity: 0 });
+    const rf = document.querySelector('.dp-row-fail');
+    if (rf) rf.classList.remove('show');
     // Reset security visualization elements
-    ['#attacker-icon', '#tee-tag', '#dp-tag', '#sa-question', '#sa-sigma', '#sa-tag'].forEach(sel => {
+    ['#attacker-icon', '#tee-tag', '#sa-sigma', '#sa-tag'].forEach(sel => {
       gsap.set(sel, { opacity: 0 });
     });
   }
