@@ -253,6 +253,33 @@
       color: var(--fg-muted);
     }
 
+    /* Customers — sits below the AI Developer card to show payment origin */
+    .customers {
+      width: 220px;
+      padding: 10px 14px;
+      background: rgba(212, 170, 111, 0.04);
+      border: 1px dashed var(--line-strong);
+      border-radius: 999px;
+      text-align: center;
+      transition: transform 0.2s var(--ease), background 0.2s var(--ease);
+    }
+    .customers.active {
+      background: rgba(212, 170, 111, 0.12);
+      transform: scale(1.02);
+    }
+    .customers-icons {
+      font-size: 1.1rem;
+      letter-spacing: 6px;
+    }
+    .customers-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--fg-muted);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
     /* ============== Flying packets ============== */
     .packet {
       position: absolute;
@@ -458,12 +485,16 @@
             </div>
           </div>
 
-          <!-- ====== Developer (right) ====== -->
+          <!-- ====== Developer + Customers (right) ====== -->
           <div class="actor-group">
             <div class="actor-label">AI Developer</div>
             <div class="developer" id="developer">
               <div class="developer-name">AI Developer</div>
               <div class="developer-task">DRC violation predictor</div>
+            </div>
+            <div class="customers" id="customers" aria-label="Customers paying the AI developer">
+              <div class="customers-icons" aria-hidden="true">👤 👤 👤</div>
+              <div class="customers-label">Customers</div>
             </div>
           </div>
         </div>
@@ -477,6 +508,7 @@
         <div class="packet packet--gradient" id="p-grad-2">∇W (encrypted)</div>
         <div class="packet packet--gradient" id="p-grad-3">∇W (encrypted)</div>
         <div class="packet packet--model"   id="p-model-final">🚀 Trained Model</div>
+        <div class="packet packet--money"   id="p-customer-pay">💰 Pays</div>
         <div class="packet packet--money"   id="p-revenue">💰 Payment</div>
         <div class="packet packet--money"   id="p-money-1">💰 50%</div>
         <div class="packet packet--money"   id="p-money-2">💰 30%</div>

@@ -14,18 +14,18 @@
   // -----------------------------------------------------------
   const SCENES = [
     { t: 0,  num: 1, text: 'Three data providers hold billions of dollars of design data — locked away.' },
-    { t: 5,  num: 2, text: 'An AI developer wants to train a DRC violation predictor.' },
-    { t: 10, num: 3, text: 'They post a training job to Kanesh, with a bounty.' },
-    { t: 16, num: 4, text: 'Kanesh sends the model — never asks for the data.' },
-    { t: 22, num: 5, text: 'Training happens where the data lives. Inside the vault. Always.' },
-    { t: 32, num: 6, text: 'Only encrypted gradients leave — protected by 5 cryptographic layers.' },
-    { t: 44, num: 7, text: 'Kanesh aggregates. The model gets stronger with every contribution.' },
-    { t: 52, num: 8, text: 'The developer gets a model trained on industry-grade data — legally.' },
-    { t: 60, num: 9, text: 'Providers earn — fairly, proportionally, automatically. Data stayed home.' },
+    { t: 5,  num: 2, text: 'An AI developer posts a training job to Kanesh, with a bounty.' },
+    { t: 16, num: 3, text: 'Kanesh sends the model — never asks for the data.' },
+    { t: 22, num: 4, text: 'Training happens where the data lives. Inside the vault. Always.' },
+    { t: 32, num: 5, text: 'Only encrypted gradients leave — protected by 5 cryptographic layers.' },
+    { t: 44, num: 6, text: 'Kanesh aggregates. The model gets stronger with every contribution.' },
+    { t: 52, num: 7, text: 'The developer gets a model trained on industry-grade data — legally.' },
+    { t: 60, num: 8, text: 'A customer pays the AI developer. Kanesh routes the revenue to providers proportionally.' },
+    { t: 67, num: 9, text: 'Every customer payment auto-flows. Recurring revenue, no extra action needed.' },
   ];
 
-  const TOTAL_DURATION = 65; // timeline-time seconds (not wall-clock)
-  const SPEED = 3;            // 3× faster — wall-clock duration ≈ 65/3 ≈ 21.7 s
+  const TOTAL_DURATION = 75; // timeline-time seconds (not wall-clock)
+  const SPEED = 3;            // 3× faster — wall-clock duration ≈ 75/3 = 25 s
 
   // -----------------------------------------------------------
   // Position helpers (relative to canvas)
@@ -72,6 +72,7 @@
     // Initial state — set all packets to platform center, opacity 0
     const platform = $('#platform');
     const developer = $('#developer');
+    const customers = $('#customers');
     const vaults = {
       dp1: $('#vault-1'),
       dp2: $('#vault-2'),
@@ -227,36 +228,86 @@
     // (gradient fade is now part of scene 7 aggregation choreography above)
     // Trained model + money packets + earnings → stay visible as the final summary frame
 
-    // ===== Scene 9 (t=60): $$$ flow — Developer → Kanesh → 3 Providers (proportional) =====
-    // Phase A (60.0–61.2): full Payment flies AI Developer → Kanesh
-    tl.add(flyPacket('p-revenue', developer, platform, { duration: 1.2 }), 60);
+    // ===== Scene 8 (t=60): $$$ flow — Customer → Developer → Kanesh → 3 Providers =====
+    // Phase A (60.0–61.0): A customer pays the AI Developer
+    tl.call(() => customers.classList.add('active'), [], 60);
+    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 1.0 }), 60);
 
-    // Phase B (61.3–61.7): "split" moment at Kanesh — Payment pulses, platform pulses, then fades
+    // Phase B (61.0–61.5): Developer briefly pulses (payment received), customer-pay fades
+    tl.fromTo(developer,
+      { scale: 1 },
+      { scale: 1.06, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' },
+      61.0
+    );
+    tl.to('#p-customer-pay', { opacity: 0, duration: 0.3 }, 61.2);
+    tl.call(() => customers.classList.remove('active'), [], 61.5);
+
+    // Phase C (61.5–62.7): Developer forwards Payment to Kanesh
+    tl.add(flyPacket('p-revenue', developer, platform, { duration: 1.2 }), 61.5);
+
+    // Phase D (62.8–63.2): "Split" moment at Kanesh
     tl.to('#p-revenue', {
       scale: 1.3,
       duration: 0.25,
       yoyo: true,
       repeat: 1,
       ease: 'sine.inOut',
-    }, 61.3);
+    }, 62.8);
     tl.fromTo(platform,
       { scale: 1.04 },
       { scale: 1.1, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' },
-      61.5
+      63.0
     );
-    tl.to('#p-revenue', { opacity: 0, duration: 0.3 }, 61.7);
+    tl.to('#p-revenue', { opacity: 0, duration: 0.3 }, 63.2);
 
-    // Phase C (61.8–63.6): 3 money packets emerge from Kanesh and fly to each provider
-    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 1.4 }), 61.8);
-    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 1.4 }), 62.0);
-    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 1.4 }), 62.2);
+    // Phase E (63.3–64.7): 3 money packets emerge from Kanesh and fly to each provider
+    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 1.4 }), 63.3);
+    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 1.4 }), 63.5);
+    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 1.4 }), 63.7);
 
-    // Phase D (63.2–63.6): earnings labels appear as money arrives
-    tl.call(() => $('#earn-1').classList.add('show'), [], 63.2);
-    tl.call(() => $('#earn-2').classList.add('show'),  [], 63.4);
-    tl.call(() => $('#earn-3').classList.add('show'),  [], 63.6);
+    // Phase F (64.7–65.1): earnings labels appear as money arrives
+    tl.call(() => $('#earn-1').classList.add('show'), [], 64.7);
+    tl.call(() => $('#earn-2').classList.add('show'),  [], 64.9);
+    tl.call(() => $('#earn-3').classList.add('show'),  [], 65.1);
 
-    // ===== End (final summary frame holds visible) =====
+    // ===== Scene 9 (t=67): Recurring revenue — 2 quick payment cycles =====
+    // Each cycle reuses the same packets via flyPacket (which set+resets each call).
+    // Compress the full chain into ~2 s per cycle so user feels the rhythm.
+
+    // ---------- Cycle 1 (t=67.0 → 68.6) ----------
+    tl.call(() => customers.classList.add('active'), [], 67.0);
+    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 0.5 }), 67.0);
+    tl.fromTo(developer, { scale: 1 }, { scale: 1.04, duration: 0.2, yoyo: true, repeat: 1 }, 67.4);
+    tl.to('#p-customer-pay', { opacity: 0, duration: 0.2 }, 67.5);
+    tl.call(() => customers.classList.remove('active'), [], 67.7);
+
+    tl.add(flyPacket('p-revenue', developer, platform, { duration: 0.5 }), 67.6);
+    tl.to('#p-revenue', { opacity: 0, duration: 0.2 }, 68.1);
+    tl.fromTo(platform, { scale: 1.04 }, { scale: 1.07, duration: 0.2, yoyo: true, repeat: 1 }, 68.0);
+
+    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 0.6 }), 68.2);
+    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 0.6 }), 68.3);
+    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 0.6 }), 68.4);
+    // Earnings labels pulse to acknowledge another payment received
+    tl.fromTo('.earnings.show', { scale: 1 }, { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1 }, 68.9);
+
+    // ---------- Cycle 2 (t=70.0 → 71.6) ----------
+    tl.call(() => customers.classList.add('active'), [], 70.0);
+    tl.add(flyPacket('p-customer-pay', customers, developer, { duration: 0.5 }), 70.0);
+    tl.fromTo(developer, { scale: 1 }, { scale: 1.04, duration: 0.2, yoyo: true, repeat: 1 }, 70.4);
+    tl.to('#p-customer-pay', { opacity: 0, duration: 0.2 }, 70.5);
+    tl.call(() => customers.classList.remove('active'), [], 70.7);
+
+    tl.add(flyPacket('p-revenue', developer, platform, { duration: 0.5 }), 70.6);
+    tl.to('#p-revenue', { opacity: 0, duration: 0.2 }, 71.1);
+    tl.fromTo(platform, { scale: 1.04 }, { scale: 1.07, duration: 0.2, yoyo: true, repeat: 1 }, 71.0);
+
+    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 0.6 }), 71.2);
+    tl.add(flyPacket('p-money-2', platform, vaults.dp2, { duration: 0.6 }), 71.3);
+    tl.add(flyPacket('p-money-3', platform, vaults.dp3, { duration: 0.6 }), 71.4);
+    tl.fromTo('.earnings.show', { scale: 1 }, { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1 }, 71.9);
+
+    // ===== End (final summary frame holds visible: model at dev, money at vaults) =====
 
     return tl;
   }
@@ -322,7 +373,10 @@
   // Step boundaries: each Next advances to the END of one scene's animated action.
   // Scene 1 is a static intro (no animation), so we skip its end-marker — first Next
   // jumps straight to end of Scene 2 (developer pulse). 8 Next clicks total = 8 actions.
-  const PAUSE_POINTS = [9.5, 15.5, 21.5, 31.5, 43.5, 51.5, 59.5, 64.5];
+  // 8 step-throughs aligned with the 8 ACTION scenes (skip static intro):
+  //   end of merged scene 2, then scenes 3, 4, 5, 6, 7, 8 (cust→dev→kanesh→prov),
+  //   and 9 (recurring).
+  const PAUSE_POINTS = [15.5, 21.5, 31.5, 43.5, 51.5, 59.5, 66, 73];
 
   const playBtn = $('#play');
   const nextBtn = $('#next');
