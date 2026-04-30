@@ -320,13 +320,15 @@
   const prevBtn = $('#prev');
   const restartBtn = $('#restart');
 
-  let stepTween = null; // tweenTo handle for cancellation
+  // Pending "pause-at-target" delayedCall handle. We use real play() (not tweenTo)
+  // so callbacks/tweens fire reliably; delayedCall just schedules WHEN to pause.
+  let stepTween = null;
 
   function killStepTween() {
-    if (stepTween && stepTween.isActive && stepTween.isActive()) {
-      stepTween.kill();
+    if (stepTween) {
+      if (typeof stepTween.kill === 'function') stepTween.kill();
+      stepTween = null;
     }
-    stepTween = null;
   }
 
   function resetVisualState() {
@@ -345,67 +347,74 @@
     else playBtn.textContent = '▶ Play all';
   }
 
-  // ===== Next step: play to the next scene boundary, then pause =====
+  // ===== Next step: play (normal speed) to next scene boundary, then pause =====
   nextBtn.addEventListener('click', () => {
     if (!timeline) return;
     killStepTween();
+    timeline.timeScale(SPEED); // make sure we're at base speed (Prev may have boosted)
 
     const t = timeline.time();
     let target = PAUSE_POINTS.find((p) => p > t + 0.05);
 
     if (target === undefined) {
-      // Already at the end — wrap back to scene 1's end
+      // Already at end — wrap back to first pause point
       resetVisualState();
       timeline.pause();
       timeline.time(0);
       target = PAUSE_POINTS[0];
     }
 
-    stepTween = timeline.tweenTo(target, {
-      duration: (target - t) / SPEED, // tweenTo doesn't inherit timeScale — apply manually
-      onComplete: () => {
-        timeline.pause();
-        setPlayLabel('paused');
-      },
+    // Real play + scheduled pause. timeScale=SPEED already in effect.
+    const realDuration = Math.max(0.01, (target - timeline.time()) / SPEED);
+    timeline.play();
+    stepTween = gsap.delayedCall(realDuration, () => {
+      timeline.pause();
+      setPlayLabel('paused');
+      stepTween = null;
     });
     setPlayLabel('playing');
   });
 
-  // ===== Prev step: go back to the previous scene's start, paused =====
+  // ===== Prev step: full reset + fast-forward to previous boundary =====
   prevBtn.addEventListener('click', () => {
     if (!timeline) return;
     killStepTween();
+    timeline.timeScale(SPEED); // base speed first
 
     const t = timeline.time();
-    // Find scene boundary BEFORE current time. Pause point N = end of scene N+1.
-    // If we're at PAUSE_POINTS[2] (end of scene 3), prev should land at PAUSE_POINTS[1] (end of scene 2).
-    let targetIdx = PAUSE_POINTS.findIndex((p) => p >= t - 0.5);
-    targetIdx = Math.max(0, targetIdx - 1);
-    const target = targetIdx === 0 && t < PAUSE_POINTS[0] ? 0 : PAUSE_POINTS[Math.max(0, targetIdx - 1)] || 0;
+    // Find the largest pause point < current time (with small epsilon)
+    let target = 0;
+    for (let i = PAUSE_POINTS.length - 1; i >= 0; i--) {
+      if (PAUSE_POINTS[i] < t - 0.5) { target = PAUSE_POINTS[i]; break; }
+    }
 
-    // To rewind safely: full reset, then fast-forward (no flicker, callbacks fire correctly)
+    // Rewind via full replay at boosted speed (callbacks fire in correct order)
     resetVisualState();
     timeline.pause();
     timeline.time(0);
-    if (target > 0) {
-      stepTween = timeline.tweenTo(target, {
-        ease: 'none',
-        duration: Math.min(0.4, target / 30), // fast rewind
-        onComplete: () => {
-          timeline.pause();
-          setPlayLabel('paused');
-        },
-      });
-      setPlayLabel('playing');
-    } else {
+
+    if (target <= 0) {
       setPlayLabel('paused');
+      return;
     }
+
+    const BOOST = 8;
+    timeline.timeScale(SPEED * BOOST);
+    timeline.play();
+    stepTween = gsap.delayedCall(target / (SPEED * BOOST), () => {
+      timeline.pause();
+      timeline.timeScale(SPEED); // restore
+      setPlayLabel('paused');
+      stepTween = null;
+    });
+    setPlayLabel('playing');
   });
 
   // ===== Play all: continuous from current point to end =====
   playBtn.addEventListener('click', () => {
     if (!timeline) return;
     killStepTween();
+    timeline.timeScale(SPEED);
 
     if (timeline.isActive()) {
       timeline.pause();
@@ -425,6 +434,7 @@
   restartBtn.addEventListener('click', () => {
     if (!timeline) return;
     killStepTween();
+    timeline.timeScale(SPEED);
     resetVisualState();
     timeline.pause();
     timeline.time(0);
