@@ -246,28 +246,27 @@
   });
 
   // -----------------------------------------------------------
-  // Controls
+  // Controls — Step-through + continuous play
   // -----------------------------------------------------------
-  const playBtn = $('#play');
-  playBtn.addEventListener('click', () => {
-    if (!timeline) return;
-    if (timeline.isActive()) {
-      timeline.pause();
-      playBtn.textContent = '▶ Resume';
-    } else {
-      // If at end, restart
-      if (timeline.time() >= TOTAL_DURATION - 0.1) {
-        timeline.restart();
-      } else {
-        timeline.play();
-      }
-      playBtn.textContent = '⏸ Pause';
-    }
-  });
+  // Pause points: end of each scene's action (just before next scene's caption fires)
+  // Index N = end of scene N+1
+  const PAUSE_POINTS = [4.5, 9.5, 15.5, 21.5, 31.5, 43.5, 51.5, 59.5, 70];
 
-  $('#restart').addEventListener('click', () => {
-    if (!timeline) return;
-    // Reset visual state
+  const playBtn = $('#play');
+  const nextBtn = $('#next');
+  const prevBtn = $('#prev');
+  const restartBtn = $('#restart');
+
+  let stepTween = null; // tweenTo handle for cancellation
+
+  function killStepTween() {
+    if (stepTween && stepTween.isActive && stepTween.isActive()) {
+      stepTween.kill();
+    }
+    stepTween = null;
+  }
+
+  function resetVisualState() {
     $$('.vault').forEach(v => v.classList.remove('training'));
     $$('.shield').forEach(s => s.classList.remove('lit'));
     $$('.earnings').forEach(e => e.classList.remove('show'));
@@ -275,7 +274,96 @@
     $('#developer').classList.remove('deployed');
     $$('.packet').forEach(p => gsap.set(p, { opacity: 0 }));
     gsap.set('#shields', { opacity: 0 });
-    timeline.restart();
-    playBtn.textContent = '⏸ Pause';
+  }
+
+  function setPlayLabel(state) {
+    if (state === 'playing') playBtn.textContent = '⏸ Pause';
+    else if (state === 'resume') playBtn.textContent = '▶ Resume';
+    else playBtn.textContent = '▶ Play all';
+  }
+
+  // ===== Next step: play to the next scene boundary, then pause =====
+  nextBtn.addEventListener('click', () => {
+    if (!timeline) return;
+    killStepTween();
+
+    const t = timeline.time();
+    let target = PAUSE_POINTS.find((p) => p > t + 0.05);
+
+    if (target === undefined) {
+      // Already at the end — wrap back to scene 1's end
+      resetVisualState();
+      timeline.pause();
+      timeline.time(0);
+      target = PAUSE_POINTS[0];
+    }
+
+    stepTween = timeline.tweenTo(target, {
+      onComplete: () => {
+        timeline.pause();
+        setPlayLabel('paused');
+      },
+    });
+    setPlayLabel('playing');
+  });
+
+  // ===== Prev step: go back to the previous scene's start, paused =====
+  prevBtn.addEventListener('click', () => {
+    if (!timeline) return;
+    killStepTween();
+
+    const t = timeline.time();
+    // Find scene boundary BEFORE current time. Pause point N = end of scene N+1.
+    // If we're at PAUSE_POINTS[2] (end of scene 3), prev should land at PAUSE_POINTS[1] (end of scene 2).
+    let targetIdx = PAUSE_POINTS.findIndex((p) => p >= t - 0.5);
+    targetIdx = Math.max(0, targetIdx - 1);
+    const target = targetIdx === 0 && t < PAUSE_POINTS[0] ? 0 : PAUSE_POINTS[Math.max(0, targetIdx - 1)] || 0;
+
+    // To rewind safely: full reset, then fast-forward (no flicker, callbacks fire correctly)
+    resetVisualState();
+    timeline.pause();
+    timeline.time(0);
+    if (target > 0) {
+      stepTween = timeline.tweenTo(target, {
+        ease: 'none',
+        duration: Math.min(0.4, target / 30), // fast rewind
+        onComplete: () => {
+          timeline.pause();
+          setPlayLabel('paused');
+        },
+      });
+      setPlayLabel('playing');
+    } else {
+      setPlayLabel('paused');
+    }
+  });
+
+  // ===== Play all: continuous from current point to end =====
+  playBtn.addEventListener('click', () => {
+    if (!timeline) return;
+    killStepTween();
+
+    if (timeline.isActive()) {
+      timeline.pause();
+      setPlayLabel('resume');
+    } else {
+      if (timeline.time() >= TOTAL_DURATION - 0.1) {
+        resetVisualState();
+        timeline.restart();
+      } else {
+        timeline.play();
+      }
+      setPlayLabel('playing');
+    }
+  });
+
+  // ===== Restart: back to scene 1, paused =====
+  restartBtn.addEventListener('click', () => {
+    if (!timeline) return;
+    killStepTween();
+    resetVisualState();
+    timeline.pause();
+    timeline.time(0);
+    setPlayLabel('paused');
   });
 })();
