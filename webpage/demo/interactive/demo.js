@@ -71,9 +71,9 @@
     const platform = $('#platform');
     const developer = $('#developer');
     const vaults = {
-      tsmc: $('#vault-1'),
-      mtk: $('#vault-2'),
-      ssg: $('#vault-3'),
+      dp1: $('#vault-1'),
+      dp2: $('#vault-2'),
+      dp3: $('#vault-3'),
     };
 
     // Place every packet at platform center initially (will fade in/move from there)
