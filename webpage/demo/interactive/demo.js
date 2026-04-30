@@ -248,9 +248,10 @@
   // -----------------------------------------------------------
   // Controls — Step-through + continuous play
   // -----------------------------------------------------------
-  // Pause points: end of each scene's action (just before next scene's caption fires)
-  // Index N = end of scene N+1
-  const PAUSE_POINTS = [4.5, 9.5, 15.5, 21.5, 31.5, 43.5, 51.5, 59.5, 70];
+  // Step boundaries: each Next advances to the END of one scene's animated action.
+  // Scene 1 is a static intro (no animation), so we skip its end-marker — first Next
+  // jumps straight to end of Scene 2 (developer pulse). 8 Next clicks total = 8 actions.
+  const PAUSE_POINTS = [9.5, 15.5, 21.5, 31.5, 43.5, 51.5, 59.5, 70];
 
   const playBtn = $('#play');
   const nextBtn = $('#next');
