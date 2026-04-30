@@ -24,7 +24,8 @@
     { t: 60, num: 9, text: 'Providers earn — fairly, proportionally, automatically. Data stayed home.' },
   ];
 
-  const TOTAL_DURATION = 70; // seconds
+  const TOTAL_DURATION = 70; // timeline-time seconds (not wall-clock)
+  const SPEED = 3;            // 3× faster — wall-clock duration ≈ 70/3 = 23 s
 
   // -----------------------------------------------------------
   // Position helpers (relative to canvas)
@@ -61,6 +62,7 @@
         $('#progress').style.width = Math.min(p, 100) + '%';
       },
     });
+    tl.timeScale(SPEED); // affects play() / reverse(); tweenTo needs explicit duration
 
     // Schedule caption + scene-number changes
     SCENES.forEach((s, i) => {
@@ -300,6 +302,7 @@
     }
 
     stepTween = timeline.tweenTo(target, {
+      duration: (target - t) / SPEED, // tweenTo doesn't inherit timeScale — apply manually
       onComplete: () => {
         timeline.pause();
         setPlayLabel('paused');
