@@ -17,15 +17,15 @@ is the **source of truth for visuals** — record from it, don't re-make it.
 
 | # | Time | Action | Subtitle |
 |---|------|--------|----------|
-| 1 | 0:00–0:08 | Three vaults visible (TSMC, MediaTek, Samsung), all 🔒 locked. Developer (right) idle. | "Three foundries hold billions of dollars of design data — locked away." |
-| 2 | 0:08–0:14 | Developer card pulses. | "An EDA AI startup wants to train a DRC violation predictor." |
+| 1 | 0:00–0:08 | Three vaults visible (Data Provider 1, Data Provider 2, Data Provider 3), all 🔒 locked. Developer (right) idle. | "Three data providers hold billions of dollars of design data — locked away." |
+| 2 | 0:08–0:14 | Developer card pulses. | "An AI developer wants to train a DRC violation predictor." |
 | 3 | 0:14–0:22 | A 💰 packet flies Developer → Kanesh. | "They post a training job to Kanesh, with a bounty." |
 | 4 | 0:22–0:30 | Three 📦 model packets fly Kanesh → each vault. **Vaults stay locked.** | "Kanesh sends the model — never asks for the data." |
 | 5 | 0:30–0:42 | Vaults glow / pulse (training inside). Locks remain. | "Training happens where the data lives. Inside the vault. Always." |
 | 6 | 0:42–0:56 | Three encrypted gradient packets fly back. **5 shields (FL · TEE · DP · SA · Audit) light up underneath.** | "Only encrypted gradients leave — protected by 5 cryptographic layers." |
 | 7 | 0:56–1:08 | Kanesh platform pulses (aggregating). Shields fade. | "Kanesh aggregates. The model gets stronger with every contribution." |
 | 8 | 1:08–1:18 | A 🚀 trained model flies Kanesh → Developer. Developer card glows green. | "The developer gets a model trained on industry-grade data — legally." |
-| 9 | 1:18–1:30 | 💰 50% / 30% / 20% packets flow back to TSMC / MediaTek / Samsung. Earnings labels appear under each vault. | "Providers earn — fairly, proportionally, automatically. Data stayed home." |
+| 9 | 1:18–1:30 | 💰 50% / 30% / 20% packets flow back to Data Provider 1 / 2 / 3. Earnings labels appear under each vault. | "Providers earn — fairly, proportionally, automatically. Data stayed home." |
 
 > The interactive demo is currently timed at ~70 seconds (snappier for live
 > step-through). For the recorded video we **record at slow speed (0.85x)**
@@ -92,7 +92,7 @@ brew install --cask obs
 7. Wait 3 more seconds (graceful tail)
 8. OBS → **Stop Recording**
 9. Trim head/tail in QuickTime (Edit → Trim) so the final clip is exactly:
-   - Start: first frame where caption "Three foundries…" is visible
+   - Start: first frame where caption "Three data providers…" is visible
    - End:   last frame where all earnings labels are visible
 
 ### 2d. Compress to <30 MB for pitch decks
@@ -135,7 +135,7 @@ limit is around 50 MB, but Gmail / Outlook attachment limit is 25 MB.
 Kanesh is the first privacy-preserving collaborative-training infrastructure
 dedicated to the EDA (Electronic Design Automation) industry.
 
-Watch how three foundries — TSMC, MediaTek, Samsung — co-train an AI model
+Watch how three data providers — Data Provider 1, Data Provider 2, Data Provider 3 — co-train an AI model
 without a single byte of raw data ever leaving their premises, and how every
 contributor gets paid fairly and automatically.
 

@@ -13,8 +13,8 @@
   // Scene captions (timed to scene start)
   // -----------------------------------------------------------
   const SCENES = [
-    { t: 0,  num: 1, text: 'Three foundries hold billions of dollars of design data — locked away.' },
-    { t: 5,  num: 2, text: 'An EDA AI startup wants to train a DRC violation predictor.' },
+    { t: 0,  num: 1, text: 'Three data providers hold billions of dollars of design data — locked away.' },
+    { t: 5,  num: 2, text: 'An AI developer wants to train a DRC violation predictor.' },
     { t: 10, num: 3, text: 'They post a training job to Kanesh, with a bounty.' },
     { t: 16, num: 4, text: 'Kanesh sends the model — never asks for the data.' },
     { t: 22, num: 5, text: 'Training happens where the data lives. Inside the vault. Always.' },
@@ -71,9 +71,9 @@
     const platform = $('#platform');
     const developer = $('#developer');
     const vaults = {
-      tsmc: $('#vault-tsmc'),
-      mtk: $('#vault-mtk'),
-      ssg: $('#vault-ssg'),
+      tsmc: $('#vault-1'),
+      mtk: $('#vault-2'),
+      ssg: $('#vault-3'),
     };
 
     // Place every packet at platform center initially (will fade in/move from there)
@@ -115,9 +115,9 @@
     tl.add(flyPacket('p-bounty', developer, platform, { duration: 1.5 }), 10);
 
     // ===== Scene 4 (t=16): Model Kanesh → 3 Providers =====
-    tl.add(flyPacket('p-model-1', platform, vaults.tsmc, { duration: 1.5 }), 16);
-    tl.add(flyPacket('p-model-2', platform, vaults.mtk,  { duration: 1.5 }), 16.2);
-    tl.add(flyPacket('p-model-3', platform, vaults.ssg,  { duration: 1.5 }), 16.4);
+    tl.add(flyPacket('p-model-1', platform, vaults.dp1, { duration: 1.5 }), 16);
+    tl.add(flyPacket('p-model-2', platform, vaults.dp2,  { duration: 1.5 }), 16.2);
+    tl.add(flyPacket('p-model-3', platform, vaults.dp3,  { duration: 1.5 }), 16.4);
 
     // ===== Scene 5 (t=22): Training in vaults — vaults light up =====
     tl.call(() => {
@@ -146,9 +146,9 @@
     }, [], 33);
 
     // 3 gradients fly back to platform
-    tl.add(flyPacket('p-grad-1', vaults.tsmc, platform, { duration: 1.6 }), 34);
-    tl.add(flyPacket('p-grad-2', vaults.mtk,  platform, { duration: 1.6 }), 34.3);
-    tl.add(flyPacket('p-grad-3', vaults.ssg,  platform, { duration: 1.6 }), 34.6);
+    tl.add(flyPacket('p-grad-1', vaults.dp1, platform, { duration: 1.6 }), 34);
+    tl.add(flyPacket('p-grad-2', vaults.dp2,  platform, { duration: 1.6 }), 34.3);
+    tl.add(flyPacket('p-grad-3', vaults.dp3,  platform, { duration: 1.6 }), 34.6);
 
     // ===== Scene 7 (t=44): Platform aggregates — pulse =====
     tl.call(() => $('#platform').classList.add('aggregating'), [], 44);
@@ -167,13 +167,13 @@
 
     // ===== Scene 9 (t=60): $$$ flows back, proportional =====
     // Money flies developer → kanesh → vaults (in sequence, different sizes already encoded in label)
-    tl.add(flyPacket('p-money-1', platform, vaults.tsmc, { duration: 1.4 }), 60);
-    tl.add(flyPacket('p-money-2', platform, vaults.mtk,  { duration: 1.4 }), 60.4);
-    tl.add(flyPacket('p-money-3', platform, vaults.ssg,  { duration: 1.4 }), 60.8);
+    tl.add(flyPacket('p-money-1', platform, vaults.dp1, { duration: 1.4 }), 60);
+    tl.add(flyPacket('p-money-2', platform, vaults.dp2,  { duration: 1.4 }), 60.4);
+    tl.add(flyPacket('p-money-3', platform, vaults.dp3,  { duration: 1.4 }), 60.8);
     // Earnings indicators appear under each vault
-    tl.call(() => $('#earn-tsmc').classList.add('show'), [], 62);
-    tl.call(() => $('#earn-mtk').classList.add('show'),  [], 62.4);
-    tl.call(() => $('#earn-ssg').classList.add('show'),  [], 62.8);
+    tl.call(() => $('#earn-1').classList.add('show'), [], 62);
+    tl.call(() => $('#earn-2').classList.add('show'),  [], 62.4);
+    tl.call(() => $('#earn-3').classList.add('show'),  [], 62.8);
 
     // ===== End (t=68+) =====
     tl.to('#caption', { /* hold final caption */ }, 70);
