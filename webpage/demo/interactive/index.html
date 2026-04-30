@@ -253,6 +253,108 @@
       color: var(--fg-muted);
     }
 
+    /* ============== Security visualizations: TEE / DP / SA ============== */
+
+    /* TEE perimeter — glowing dashed ring around each vault during training.
+       Visualizes the hardware enclave boundary that breach attempts can't cross. */
+    .vault::after {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border: 2px dashed rgba(95, 184, 148, 0);
+      border-radius: 22px;
+      pointer-events: none;
+      transition: border-color 0.4s var(--ease);
+    }
+    .vault.tee-active::after {
+      border-color: rgba(95, 184, 148, 0.5);
+      animation: tee-glow 2.5s ease-in-out infinite;
+    }
+    @keyframes tee-glow {
+      0%, 100% { border-color: rgba(95, 184, 148, 0.45); }
+      50%      { border-color: rgba(95, 184, 148, 0.85); }
+    }
+
+    /* Security icons (attacker emoji, "?", "Σ") — float above the canvas. */
+    .security-icon {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 6;
+    }
+    .security-icon.attacker {
+      font-size: 1.5rem;
+      filter: drop-shadow(0 0 10px rgba(224, 111, 90, 0.7));
+    }
+    .security-icon.sa-question {
+      font-size: 2.6rem;
+      color: #E9C88E;
+      text-shadow: 0 0 18px rgba(233, 200, 142, 0.65);
+    }
+    .security-icon.sa-sigma {
+      font-size: 2.2rem;
+      color: var(--accent-bright);
+      text-shadow: 0 0 16px rgba(233, 200, 142, 0.75);
+    }
+
+    /* Floating annotation tags ("TEE blocks breach", etc.) */
+    .security-tag {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 5px 11px;
+      background: rgba(10, 26, 51, 0.9);
+      border: 1px solid var(--accent-strong);
+      border-radius: 999px;
+      color: var(--accent-strong);
+      opacity: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 7;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+    .security-tag--danger {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* DP noise effect — speckled halo around gradient packets while they fly,
+       visualizing that the gradient carries calibrated noise so raw data
+       can't be reverse-engineered. */
+    .packet--gradient {
+      position: absolute;
+    }
+    .packet--gradient::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 22% 35%, rgba(201, 176, 224, 0.55) 1.5px, transparent 3px),
+        radial-gradient(circle at 78% 62%, rgba(201, 176, 224, 0.45) 1.5px, transparent 3px),
+        radial-gradient(circle at 50% 18%, rgba(201, 176, 224, 0.4) 1.5px, transparent 3px),
+        radial-gradient(circle at 12% 75%, rgba(201, 176, 224, 0.35) 1.5px, transparent 3px),
+        radial-gradient(circle at 88% 25%, rgba(201, 176, 224, 0.4) 1.5px, transparent 3px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease);
+    }
+    .packet--gradient.dp-noisy::before {
+      opacity: 1;
+      animation: noise-jitter 0.45s steps(4) infinite;
+    }
+    @keyframes noise-jitter {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(2px, -1px); }
+      50%  { transform: translate(-2px, 1px); }
+      75%  { transform: translate(1px, 2px); }
+      100% { transform: translate(0, 0); }
+    }
+
     /* Customers — sits below the AI Developer card to show payment origin */
     .customers {
       width: 220px;
@@ -513,6 +615,14 @@
         <div class="packet packet--money"   id="p-money-1">💰 50%</div>
         <div class="packet packet--money"   id="p-money-2">💰 30%</div>
         <div class="packet packet--money"   id="p-money-3">💰 20%</div>
+
+        <!-- ====== Security visualizations (TEE / DP / SA) ====== -->
+        <div class="security-icon attacker" id="attacker-icon" aria-hidden="true">⚠️</div>
+        <div class="security-tag security-tag--danger" id="tee-tag">TEE blocks breach</div>
+        <div class="security-tag" id="dp-tag">Gradients + DP noise</div>
+        <div class="security-icon sa-question" id="sa-question" aria-hidden="true">?</div>
+        <div class="security-icon sa-sigma" id="sa-sigma" aria-hidden="true">Σ</div>
+        <div class="security-tag" id="sa-tag">Coordinator sees only the sum</div>
 
         <!-- 5 protection shields -->
         <div class="shields" id="shields">

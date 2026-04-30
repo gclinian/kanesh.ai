@@ -79,6 +79,14 @@
       dp3: $('#vault-3'),
     };
 
+    // Security visualization elements
+    const attackerEl = $('#attacker-icon');
+    const teeTag = $('#tee-tag');
+    const dpTag = $('#dp-tag');
+    const saQuestion = $('#sa-question');
+    const saSigma = $('#sa-sigma');
+    const saTag = $('#sa-tag');
+
     // Place every packet at platform center initially (will fade in/move from there)
     function resetPacket(id, anchor = platform) {
       const a = rectIn(anchor);
@@ -130,6 +138,8 @@
     // ===== Scene 5 (t=22): Training in vaults — vaults light up =====
     tl.call(() => {
       Object.values(vaults).forEach(v => v.classList.add('training'));
+      // ▶ TEE: activate hardware-enclave perimeter (dashed glow ring around vaults)
+      Object.values(vaults).forEach(v => v.classList.add('tee-active'));
     }, [], 22);
     // pulse glow during training
     tl.to(Object.values(vaults), {
@@ -140,6 +150,29 @@
       ease: 'sine.inOut',
     }, 22);
 
+    // ▶ TEE attack visualization — attacker tries to breach vault 2, gets bounced.
+    // Visualizes: even if the server is "hacked", the TEE enclave keeps data safe.
+    const v2r = rectIn(vaults.dp2);
+    const platR = rectIn(platform);
+    tl.set(attackerEl, { x: v2r.x - 110, y: v2r.cy - 14, opacity: 0 }, 25);
+    tl.to(attackerEl, { opacity: 1, duration: 0.3 }, 25);
+    // Approach
+    tl.to(attackerEl, { x: v2r.x - 30, duration: 0.6, ease: 'power2.in' }, 25.3);
+    // Hit — vault TEE flashes
+    tl.to(vaults.dp2, {
+      boxShadow: '0 0 40px rgba(95, 184, 148, 0.95), inset 0 0 24px rgba(95, 184, 148, 0.4)',
+      duration: 0.18,
+      yoyo: true,
+      repeat: 1,
+    }, 25.85);
+    // Bounce back
+    tl.to(attackerEl, { x: v2r.x - 130, duration: 0.55, ease: 'back.out(2)' }, 25.9);
+    // "TEE blocks breach" tag
+    tl.set(teeTag, { x: v2r.x - 145, y: v2r.cy + 32, opacity: 0 }, 26);
+    tl.to(teeTag, { opacity: 1, duration: 0.3 }, 26);
+    tl.to(teeTag, { opacity: 0, duration: 0.3 }, 28.5);
+    tl.to(attackerEl, { opacity: 0, duration: 0.3 }, 26.6);
+
     // ===== Scene 6 (t=32): Encrypted gradients flow back, shields light up =====
     // Show shields container
     tl.to('#shields', { opacity: 1, duration: 0.4 }, 32);
@@ -148,9 +181,12 @@
     shieldEls.forEach((sh, i) => {
       tl.call(() => sh.classList.add('lit'), [], 32 + i * 0.4);
     });
-    // Stop training glow + remove training class once gradients fly
+    // Stop training glow + remove training class + deactivate TEE perimeter
     tl.call(() => {
-      Object.values(vaults).forEach(v => v.classList.remove('training'));
+      Object.values(vaults).forEach(v => {
+        v.classList.remove('training');
+        v.classList.remove('tee-active');
+      });
     }, [], 33);
 
     // 3 gradients fly back to platform — but land in a VERTICAL QUEUE just left
@@ -162,7 +198,39 @@
     tl.add(flyPacket('p-grad-2', vaults.dp2, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: 0          }), 34.3);
     tl.add(flyPacket('p-grad-3', vaults.dp3, platform, { duration: 1.6, offsetX: GRAD_DX, offsetY: GRAD_DY    }), 34.6);
 
+    // ▶ DP visualization — gradients carry visible noise dust while in flight.
+    // Visualizes: the gradient is calibrated-noisy, so raw data can't be reverse-engineered.
+    tl.call(() => {
+      ['p-grad-1', 'p-grad-2', 'p-grad-3'].forEach(id => $('#' + id).classList.add('dp-noisy'));
+    }, [], 34);
+    // DP tag flashes mid-flight
+    const dpTagX = (v2r.cx + platR.cx) / 2 - 95;
+    const dpTagY = platR.y - 18;
+    tl.set(dpTag, { x: dpTagX, y: dpTagY, opacity: 0 }, 35);
+    tl.to(dpTag, { opacity: 1, duration: 0.3 }, 35);
+    tl.to(dpTag, { opacity: 0, duration: 0.3 }, 37.5);
+    // Drop dp-noisy when gradients have arrived at queue (they look "settled")
+    tl.call(() => {
+      ['p-grad-1', 'p-grad-2', 'p-grad-3'].forEach(id => $('#' + id).classList.remove('dp-noisy'));
+    }, [], 36.5);
+
+    // ▶ SA visualization — "?" appears above Kanesh as gradients queue up,
+    // signalling the coordinator can see them but can't read individual values.
+    tl.set(saQuestion, { x: platR.cx - 18, y: platR.y - 60, opacity: 0, scale: 0.6 }, 41);
+    tl.to(saQuestion, { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)' }, 41);
+    tl.set(saTag, { x: platR.cx - 145, y: platR.y - 96, opacity: 0 }, 41.4);
+    tl.to(saTag, { opacity: 1, duration: 0.3 }, 41.4);
+
     // ===== Scene 7 (t=44): Aggregation — 3 gradients converge into platform, become trained model =====
+    // ▶ SA continued: "?" → "Σ" visually shows the coordinator only knows the SUM.
+    tl.to(saQuestion, { opacity: 0, scale: 0.6, duration: 0.4 }, 44.6);
+    tl.set(saSigma, { x: platR.cx - 16, y: platR.y - 56, opacity: 0, scale: 0.5 }, 45.0);
+    tl.to(saSigma, { opacity: 1, scale: 1.2, duration: 0.5, ease: 'back.out(2)' }, 45.0);
+    tl.to(saSigma, { scale: 1, duration: 0.3 }, 45.5);
+    // Σ + tag fade as the trained model emerges
+    tl.to(saSigma, { opacity: 0, duration: 0.4 }, 46.5);
+    tl.to(saTag, { opacity: 0, duration: 0.3 }, 46.7);
+
     tl.call(() => $('#platform').classList.add('aggregating'), [], 44);
     tl.fromTo(platform,
       { scale: 1.04 },
@@ -395,13 +463,25 @@
   }
 
   function resetVisualState() {
-    $$('.vault').forEach(v => v.classList.remove('training'));
+    $$('.vault').forEach(v => {
+      v.classList.remove('training');
+      v.classList.remove('tee-active');
+    });
     $$('.shield').forEach(s => s.classList.remove('lit'));
     $$('.earnings').forEach(e => e.classList.remove('show'));
     $('#platform').classList.remove('aggregating');
     $('#developer').classList.remove('deployed');
-    $$('.packet').forEach(p => gsap.set(p, { opacity: 0 }));
+    const customersEl = document.getElementById('customers');
+    if (customersEl) customersEl.classList.remove('active');
+    $$('.packet').forEach(p => {
+      gsap.set(p, { opacity: 0 });
+      p.classList.remove('dp-noisy');
+    });
     gsap.set('#shields', { opacity: 0 });
+    // Reset security visualization elements
+    ['#attacker-icon', '#tee-tag', '#dp-tag', '#sa-question', '#sa-sigma', '#sa-tag'].forEach(sel => {
+      gsap.set(sel, { opacity: 0 });
+    });
   }
 
   function setPlayLabel(state) {
